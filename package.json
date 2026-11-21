@@ -1,0 +1,56 @@
+{
+  "name": "ctx-sync",
+  "version": "0.1.0",
+  "description": "Compile AI context rules from .ai/ into native editor files, audit token usage, and catch leaked secrets in CI.",
+  "type": "module",
+  "license": "MIT",
+  "author": "ctx-sync contributors",
+  "keywords": [
+    "ai",
+    "context",
+    "claude",
+    "cursor",
+    "copilot",
+    "windsurf",
+    "cli",
+    "developer-tools",
+    "secrets",
+    "tokens"
+  ],
+  "bin": {
+    "ctx-sync": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "action.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"try { require('node:fs').chmodSync('dist/cli.js', 0o755) } catch {}\"",
+    "build:test": "tsc -p tsconfig.test.json",
+    "test": "npm run build && npm run build:test && node --test .test-build/tests/",
+    "start": "node dist/cli.js",
+    "check": "npm run build && node dist/cli.js build --check",
+    "audit": "node dist/cli.js audit",
+    "clean": "node -e \"const fs=require('node:fs'); for (const dir of ['dist','.test-build']) fs.rmSync(dir,{recursive:true,force:true})\"",
+    "prepublishOnly": "npm run clean && npm test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^5.9.3"
+  }
+}

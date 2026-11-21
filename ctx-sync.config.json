@@ -1,0 +1,11 @@
+{
+  "sourceDir": ".ai",
+  "tokenBudget": {
+    "maxPerProfile": 6000,
+    "maxPerBlock": 1200
+  },
+  "secrets": {
+    "allowlist": [],
+    "disabledRules": []
+  }
+}
