@@ -2,9 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ["**"]
   pull_request:
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -15,7 +13,7 @@ concurrency:
 
 jobs:
   test:
-    name: Test Node ${{ matrix.node }}
+    name: Build, test and check (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -34,10 +32,15 @@ jobs:
       - name: Install dev tooling
         run: npm ci
 
-      - name: Unit tests
+      - name: Build
+        run: npm run build
+
+      - name: Test
         run: npm test
 
-      - name: Verify native files are current and the context is safe
+      # Dogfooding: the repository's own AI context must be in sync with .ai/
+      # and free of exposed secrets. Exits 1 otherwise (warnings too, --strict).
+      - name: ctx-sync check
         run: node dist/index.js check --strict
 
   action:
