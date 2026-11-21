@@ -68,4 +68,18 @@ export type {
   SourceTokenEstimate,
   TokenEstimatorMethod,
 } from "./readers/tokenEstimator.js";
+export {
+  DEFAULT_CONTEXT_MAX_TOKENS,
+  auditContext,
+} from "./auditor/contextAuditor.js";
+export {
+  formatAnnotations,
+  formatJson,
+  formatReport,
+  formatTerminal,
+  isGithubActions,
+  shouldUseColor,
+  wantsJson,
+} from "./auditor/reporter.js";
+export type { ReportOptions } from "./auditor/reporter.js";
 export { SECRET_PATTERNS, scanSecrets } from "./auditor/secrets.js";

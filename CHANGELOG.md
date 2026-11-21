@@ -8,6 +8,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and
 
 ### Added
 
+- `src/auditor/contextAuditor.ts`: `auditContext()` grades the compiled context
+  `ok`/`warning`/`critical`. Critical: exposed secrets (Anthropic, OpenAI,
+  GitHub, AWS, Bearer, ...) or, in `check` mode, generated files out of sync
+  with `.ai/`. Warning: over `maxTokens` (default 4000), or empty/duplicate
+  rules. `ignorePatterns` skips known false positives.
+- `src/auditor/reporter.ts`: ANSI terminal report with a per-assistant token
+  breakdown, clean `--json` output, and `::error::`/`::warning::` annotations
+  when `GITHUB_ACTIONS=true`.
+- Bearer detection no longer requires an `Authorization:` prefix.
 - Adapter registry in `src/adapters/index.ts` that auto-discovers
   `src/adapters/*Adapter.ts` modules, so a new assistant is a single new file.
   Exposes `listProfiles()`, `getAdapter()` and `isTargetProfile()`.

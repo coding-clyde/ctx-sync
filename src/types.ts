@@ -504,3 +504,75 @@ export interface LoadConfigOptions {
   maxPerProfile?: number;
   maxPerBlock?: number;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Context audit (contextAuditor / reporter)                                  */
+/* -------------------------------------------------------------------------- */
+
+/** "check" additionally verifies generated files on disk against `.ai/`. */
+export type ContextAuditMode = "audit" | "check";
+
+export type ContextIssueCategory =
+  | "secret"
+  | "stale-output"
+  | "token-budget"
+  | "empty-block"
+  | "duplicate-block"
+  | "source";
+
+export interface ContextIssue {
+  id: string;
+  category: ContextIssueCategory;
+  severity: Exclude<Severity, "ok">;
+  message: string;
+  /** Repository-relative POSIX path. */
+  path?: string;
+  line?: number;
+  column?: number;
+  profile?: TargetProfile;
+  /** Secret detector id; never the secret itself. */
+  ruleId?: string;
+  fingerprint?: string;
+}
+
+export interface ContextAuditOptions {
+  rootDir: string;
+  sourceDir?: string;
+  profiles?: TargetProfile[];
+  /** Defaults to "audit". */
+  mode?: ContextAuditMode;
+  /** Token budget; defaults to 4000. 0 disables the check. */
+  maxTokens?: number;
+  /**
+   * Case-insensitive regular expressions. A match against a repository-relative
+   * path skips that file; a match against a detected value or its line
+   * suppresses that secret finding.
+   */
+  ignorePatterns?: string[];
+  /** Injectable clock for deterministic output. */
+  now?: Date;
+}
+
+/** Compiled-context cost of one assistant. */
+export interface AssistantTokenUsage {
+  profile: TargetProfile;
+  label: string;
+  paths: string[];
+  blocks: number;
+  characters: number;
+  estimatedTokens: number;
+}
+
+export interface ContextAuditResult {
+  schemaVersion: 1;
+  tool: { name: string; version: string };
+  generatedAt: string;
+  mode: ContextAuditMode;
+  severity: Severity;
+  maxTokens: number;
+  /** Tokens of the enabled rules, counted once (source of truth). */
+  totalTokens: number;
+  assistants: AssistantTokenUsage[];
+  filesScanned: number;
+  issues: ContextIssue[];
+}

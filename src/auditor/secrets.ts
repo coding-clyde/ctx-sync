@@ -141,9 +141,9 @@ export const SECRET_PATTERNS: readonly SecretPattern[] = [
   {
     id: "bearer-token",
     name: "Bearer token",
-    description: "An Authorization: Bearer header contains a long-lived token.",
+    description: "A Bearer token (e.g. in an Authorization header) is exposed.",
     severity: "warning",
-    pattern: /\bAuthorization\s*:\s*Bearer\s+([A-Za-z0-9._~+/=-]{20,})/i,
+    pattern: /\bBearer\s+([A-Za-z0-9._~+/=-]{20,})/i,
     valueGroup: 1,
     suppressPlaceholders: true,
   },
