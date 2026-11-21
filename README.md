@@ -85,9 +85,33 @@ block strings. Unknown keys are preserved but not emitted.
 | `tags` | string or string[] | `[]` | Metadata for humans and future tooling. |
 | `maxTokens` | positive integer | config default | Per-rule audit budget. |
 
+`files`, `patterns` and `filePatterns` are accepted as aliases for `globs`;
+`assistants` and `profiles` are accepted as aliases for `targets`.
+
 Valid profiles are `claude`, `cursor`, `copilot`, and `windsurf`. A typo in
 `targets` is a build error, never a silent fallback to every editor. Duplicate
 ids are also build errors.
+
+### Programmatic readers
+
+The CLI is built on three small, read-only modules:
+
+- `src/readers/sourceReader.ts` — validates the source directory and parses
+  Markdown into deterministic `RuleBlock`s.
+- `src/readers/tokenEstimator.ts` — measures characters, lines, words and
+  estimated tokens per file and per block.
+- `src/readers/index.ts` — `readProjectContext()` bundles the parsed source,
+  token estimates, and the native context files that already exist.
+
+```ts
+import { readProjectContext } from "ctx-sync";
+
+const context = await readProjectContext({ rootDir: process.cwd() });
+console.log(context.source.blocks, context.tokens.total, context.existingOutputs);
+```
+
+`readSourceTree` and `src/auditor/tokens.ts` remain available as compatibility
+entry points.
 
 ## Commands
 
@@ -331,8 +355,11 @@ the network. CI runs Node 20, 22, and 24 plus a self-test of the Action.
 │   │   └── tokens.ts
 │   ├── readers/
 │   │   ├── frontmatter.ts
+│   │   ├── index.ts
 │   │   ├── markdown.ts
-│   │   └── source.ts
+│   │   ├── source.ts
+│   │   ├── sourceReader.ts
+│   │   └── tokenEstimator.ts
 │   ├── utils/
 │   │   ├── format.ts
 │   │   ├── fs.ts
@@ -351,6 +378,7 @@ the network. CI runs Node 20, 22, and 24 plus a self-test of the Action.
 │   ├── cli.test.ts
 │   ├── frontmatter.test.ts
 │   ├── helpers.ts
+│   ├── readers.test.ts
 │   ├── secrets.test.ts
 │   ├── source.test.ts
 │   ├── sync.test.ts

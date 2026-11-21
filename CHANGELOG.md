@@ -6,6 +6,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and
 
 ## [Unreleased]
 
+### Changed
+
+- Split source discovery/parsing into `src/readers/sourceReader.ts`, token
+  measurement into `src/readers/tokenEstimator.ts`, and added
+  `readProjectContext()` in `src/readers/index.ts` to validate `.ai`, estimate
+  tokens per file and block, and detect existing native context files.
+- Existing `readSourceTree` and `auditor/tokens.ts` imports remain supported as
+  compatibility re-exports.
+
 ## [0.1.0] - 2026-11-21
 
 ### Added
@@ -22,4 +31,4 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and
   suppression markers, and placeholder filtering.
 - `ctx-sync audit` with text, JSON, and GitHub Actions annotation output.
 - GitHub Action with `build` and `audit` modes.
-- Node 20/22/24 CI, 58 tests with `node --test`, and self-hosted `.ai/` rules.
+- Node 20/22/24 CI, 66 tests with `node --test`, and self-hosted `.ai/` rules.

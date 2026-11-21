@@ -204,6 +204,23 @@ function parseString(
   return value.trim();
 }
 
+/**
+ * Return the first present key. Frontmatter accepts a few human-friendly
+ * aliases so authors can write "files" instead of "globs" or "assistants"
+ * instead of "targets".
+ */
+function firstDefined(
+  data: Record<string, unknown>,
+  keys: readonly string[],
+): unknown {
+  for (const key of keys) {
+    if (data[key] !== undefined) {
+      return data[key];
+    }
+  }
+  return undefined;
+}
+
 function parseTargets(
   value: unknown,
   path: string,
@@ -336,8 +353,7 @@ function parseTags(
   value: unknown,
   path: string,
   diagnostics: Diagnostic[],
-): string[] {
-  if (value === undefined) {
+): string[] {  if (value === undefined) {
     return [];
   }
   if (typeof value === "string") {
@@ -482,8 +498,16 @@ export function parseRuleFile(
       ? truncateDescription(oneLine(rawDescription))
       : deriveDescription(body);
 
-  const targets = parseTargets(frontmatter.data["targets"], options.path, diagnostics);
-  const globs = parseGlobs(frontmatter.data["globs"], options.path, diagnostics);
+  const targets = parseTargets(
+    firstDefined(frontmatter.data, ["targets", "assistants", "profiles"]),
+    options.path,
+    diagnostics,
+  );
+  const globs = parseGlobs(
+    firstDefined(frontmatter.data, ["globs", "files", "patterns", "filePatterns"]),
+    options.path,
+    diagnostics,
+  );
 
   const rawPriority = frontmatter.data["priority"];
   let priority = 0;

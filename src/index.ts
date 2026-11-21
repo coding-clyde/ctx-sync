@@ -26,7 +26,15 @@ export type {
   ParseRuleFileResult,
 } from "./readers/markdown.js";
 export { readSourceTree } from "./readers/source.js";
-export type { ReadSourceOptions } from "./readers/source.js";
+export { readSourceDirectory } from "./readers/sourceReader.js";
+export type { ReadSourceOptions } from "./readers/sourceReader.js";
+export { readProjectContext } from "./readers/index.js";
+export type {
+  DetectedContextFile,
+  ExistingContextKind,
+  ProjectReaderContext,
+  ProjectReaderOptions,
+} from "./readers/index.js";
 export { ADAPTERS, renderAllProfiles, renderProfile } from "./adapters/index.js";
 export { claudeAdapter } from "./adapters/claude.js";
 export { copilotAdapter } from "./adapters/copilot.js";
@@ -35,11 +43,21 @@ export { windsurfAdapter } from "./adapters/windsurf.js";
 export { planBuild, syncProject } from "./sync.js";
 export { auditProject, measureBlocks } from "./auditor/index.js";
 export {
+  TOKEN_ESTIMATOR_METHOD,
   combineMetrics,
   countCharacters,
   countLines,
+  estimateBlockTokens,
+  estimateFileTokens,
+  estimateSourceTokens,
   estimateTokens,
   measureText,
   tokenStatus,
-} from "./auditor/tokens.js";
+} from "./readers/tokenEstimator.js";
+export type {
+  BlockTokenEstimate,
+  FileTokenEstimate,
+  SourceTokenEstimate,
+  TokenEstimatorMethod,
+} from "./readers/tokenEstimator.js";
 export { SECRET_PATTERNS, scanSecrets } from "./auditor/secrets.js";
