@@ -23,5 +23,5 @@ tags: [security]
   `secrets.allowlist` in `ctx-sync.config.json`.
 - Never weaken a high-signal pattern to silence a false positive. Prefer an
   allowlist entry with a comment explaining why the value is safe.
-- CI must run `ctx-sync audit --fail-on warning`. A redacted finding requires
+- CI must run `ctx-sync check --strict`. A redacted finding requires
   rotating the credential if it was ever real.

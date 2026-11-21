@@ -19,7 +19,7 @@ test("package metadata stays in sync with the CLI version", async () => {
   };
 
   assert.equal(packageJson.version, VERSION);
-  assert.equal(packageJson.bin["ctx-sync"], "./dist/cli.js");
+  assert.equal(packageJson.bin["ctx-sync"], "./dist/index.js");
   assert.deepEqual(packageJson.dependencies, {});
   assert.deepEqual(Object.keys(packageJson.devDependencies).sort(), [
     "@types/node",

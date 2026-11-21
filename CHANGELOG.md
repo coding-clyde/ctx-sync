@@ -8,6 +8,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and
 
 ### Added
 
+- New command line: `ctx-sync init`, `ctx-sync sync` and `ctx-sync check`,
+  parsed with `util.parseArgs` in `src/cli.ts`, with `--targets`,
+  `--max-tokens`, `--strict`, `--json`, `--help`/`-h` and `--version`/`-v`
+  (plus `--force` for `sync`). Exit code 1 on critical findings (also on
+  warnings with `--strict`), 2 on usage/file errors, with one-line messages
+  and no stack traces.
+- `init` scaffolds `.ai/` with four starter rules and never overwrites an
+  existing `.ai/`.
+- `sync` audits before writing and writes nothing when a critical finding
+  (such as an exposed secret) exists.
+- `src/index.ts` is now the executable (`#!/usr/bin/env node`) and the public
+  API; the `bin` entry points to `dist/index.js`.
+
 - `src/auditor/contextAuditor.ts`: `auditContext()` grades the compiled context
   `ok`/`warning`/`critical`. Critical: exposed secrets (Anthropic, OpenAI,
   GitHub, AWS, Bearer, ...) or, in `check` mode, generated files out of sync
@@ -24,6 +37,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and
   source comments; rule headings are nested under each section.
 
 ### Changed
+
+- **Breaking:** `ctx-sync build` and `ctx-sync audit` are replaced by `sync`
+  and `check`; `--profile` is now `--targets`. The GitHub Action now runs
+  `ctx-sync check` and accepts only `targets`, `max-tokens` and `strict`
+  (it also sets up Node 20).
+- `npm test` passes explicit test files to `node --test`; passing a directory
+  no longer works on Node 22+.
 
 - Adapters renamed to `claudeAdapter.ts`, `cursorAdapter.ts`,
   `copilotAdapter.ts` and `windsurfAdapter.ts`. `TargetProfile` is now a

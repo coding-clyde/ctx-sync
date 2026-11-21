@@ -18,7 +18,7 @@
     "tokens"
   ],
   "bin": {
-    "ctx-sync": "./dist/cli.js"
+    "ctx-sync": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -39,12 +39,12 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && node -e \"try { require('node:fs').chmodSync('dist/cli.js', 0o755) } catch {}\"",
+    "build": "tsc -p tsconfig.json && node -e \"try { require('node:fs').chmodSync('dist/index.js', 0o755) } catch {}\"",
     "build:test": "tsc -p tsconfig.test.json",
-    "test": "npm run build && npm run build:test && node --test .test-build/tests/",
-    "start": "node dist/cli.js",
-    "check": "npm run build && node dist/cli.js build --check",
-    "audit": "node dist/cli.js audit",
+    "test": "npm run build && npm run build:test && node --test .test-build/tests/*.test.js",
+    "start": "node dist/index.js",
+    "sync": "npm run build && node dist/index.js sync",
+    "check": "npm run build && node dist/index.js check",
     "clean": "node -e \"const fs=require('node:fs'); for (const dir of ['dist','.test-build']) fs.rmSync(dir,{recursive:true,force:true})\"",
     "prepublishOnly": "npm run clean && npm test"
   },

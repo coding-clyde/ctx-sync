@@ -73,10 +73,15 @@ export interface CliResult {
 export function runCli(
   args: readonly string[],
   cwd: string,
+  env: Record<string, string> = {},
 ): Promise<CliResult> {
-  const cli = path.join(PROJECT_ROOT, "dist", "cli.js");
+  const cli = path.join(PROJECT_ROOT, "dist", "index.js");
   const environment: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1" };
+  // Keep output independent of where the tests run (e.g. inside GitHub Actions).
   delete environment["CTX_SYNC_DEBUG"];
+  delete environment["GITHUB_ACTIONS"];
+  delete environment["FORCE_COLOR"];
+  Object.assign(environment, env);
 
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [cli, ...args], {

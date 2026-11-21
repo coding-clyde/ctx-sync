@@ -1,4 +1,9 @@
-import type { ContextAuditResult, ContextIssue, Severity } from "../types.js";
+import type {
+  ContextAuditResult,
+  ContextIssue,
+  FileChange,
+  Severity,
+} from "../types.js";
 import { formatNumber, padEnd, padStart, plural } from "../utils/format.js";
 import { formatGithubAnnotation } from "../utils/github.js";
 import { TOOL_NAME, VERSION } from "../version.js";
@@ -158,4 +163,50 @@ export function formatReport(
   }
   parts.push(formatTerminal(result, options.color ?? false));
   return parts.join("\n");
+}
+
+/** Human-readable list of what `sync` wrote, one line per file. */
+export function formatSyncChanges(
+  changes: readonly FileChange[],
+  color = false,
+): string {
+  const c = {
+    bold: ansi(color, "1"),
+    dim: ansi(color, "2"),
+    red: ansi(color, "31"),
+    yellow: ansi(color, "33"),
+    green: ansi(color, "32"),
+  };
+  const lines: string[] = [c.bold(`${TOOL_NAME} sync v${VERSION}`), ""];
+
+  const paint: Record<FileChange["status"], (value: string) => string> = {
+    created: c.green,
+    updated: c.yellow,
+    removed: c.red,
+    blocked: c.red,
+    unchanged: c.dim,
+  };
+  for (const change of changes) {
+    lines.push(
+      `  ${paint[change.status](padEnd(change.status, 9))} ${change.path} ${c.dim(
+        `(${formatNumber(change.estimatedTokens)} est. tokens)`,
+      )}`,
+    );
+  }
+
+  const count = (status: FileChange["status"]): number =>
+    changes.filter((change) => change.status === status).length;
+  const wrote = count("created") + count("updated");
+  const removed = count("removed");
+  lines.push("");
+  lines.push(
+    wrote + removed === 0
+      ? c.green("All generated files were already up to date.")
+      : c.green(
+          `Wrote ${wrote} ${plural(wrote, "file")}, removed ${removed}; ${count(
+            "unchanged",
+          )} unchanged.`,
+        ),
+  );
+  return lines.join("\n");
 }
