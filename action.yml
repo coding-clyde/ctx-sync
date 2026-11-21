@@ -1,112 +1,81 @@
 name: ctx-sync
-description: Sync AI context rules, enforce token budgets, and block leaked secrets in CI.
+description: Fail the check when AI context files are out of sync with .ai/ or expose secrets.
 author: ctx-sync contributors
 branding:
   icon: shield
   color: blue
 
 inputs:
-  command:
-    description: "Command to run: build or audit."
-    required: false
-    default: audit
-  root:
-    description: "Repository root. Defaults to the GitHub workspace."
+  targets:
+    description: "Comma-separated assistants to check (claude, cursor, copilot, windsurf). Empty means all enabled in ctx-sync.config.json."
     required: false
     default: ""
-  source-dir:
-    description: "Context source directory, relative to the repository root."
-    required: false
-    default: ".ai"
-  profiles:
-    description: "Comma-separated profiles to include (claude, cursor, copilot, windsurf). Empty means config/default."
+  max-tokens:
+    description: "Token budget per assistant and in total. Empty uses the default (4000); 0 disables the check."
     required: false
     default: ""
-  fail-on:
-    description: "Audit failure threshold: warning, critical, or never."
+  strict:
+    description: "Also fail on warnings (token budget exceeded, empty or duplicate rules)."
     required: false
-    default: warning
-  check:
-    description: "For command=build: verify generated files are current instead of writing."
-    required: false
-    default: "true"
-  annotations:
-    description: "Emit GitHub Actions annotations (recommended). Set to false for plain text."
-    required: false
-    default: "true"
+    default: "false"
 
 runs:
   using: composite
   steps:
-    - name: Prepare ctx-sync
+    - name: Set up Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: Build ctx-sync
       shell: bash
       working-directory: ${{ github.action_path }}
       run: |
         set -euo pipefail
-        if [ ! -f dist/cli.js ]; then
-          npm ci --no-audit --no-fund --loglevel=error
+        if [ ! -f dist/index.js ]; then
+          npm ci --ignore-scripts --no-audit --no-fund --loglevel=error
           npm run build --silent
         fi
 
-    - name: Run ctx-sync
+    - name: Run ctx-sync check
       shell: bash
+      working-directory: ${{ github.workspace }}
       env:
-        INPUT_COMMAND: ${{ inputs.command }}
-        INPUT_ROOT: ${{ inputs.root }}
-        INPUT_SOURCE_DIR: ${{ inputs.source-dir }}
-        INPUT_PROFILES: ${{ inputs.profiles }}
-        INPUT_FAIL_ON: ${{ inputs.fail-on }}
-        INPUT_CHECK: ${{ inputs.check }}
-        INPUT_ANNOTATIONS: ${{ inputs.annotations }}
+        INPUT_TARGETS: ${{ inputs.targets }}
+        INPUT_MAX_TOKENS: ${{ inputs.max-tokens }}
+        INPUT_STRICT: ${{ inputs.strict }}
       run: |
         set -euo pipefail
 
-        command="${INPUT_COMMAND,,}"
-        case "$command" in
-          audit|build) ;;
+        args=( check )
+
+        # Inputs reach the shell only through env vars, never interpolated into
+        # the script, so a crafted value cannot inject commands.
+        targets="${INPUT_TARGETS//[[:space:]]/}"
+        if [ -n "$targets" ]; then
+          args+=( --targets "$targets" )
+        fi
+
+        max_tokens="${INPUT_MAX_TOKENS//[[:space:]]/}"
+        if [ -n "$max_tokens" ]; then
+          if [[ ! "$max_tokens" =~ ^[0-9]+$ ]]; then
+            echo "::error title=ctx-sync::Invalid max-tokens '${INPUT_MAX_TOKENS}'. Use a non-negative integer (0 disables the limit)."
+            exit 2
+          fi
+          args+=( --max-tokens "$max_tokens" )
+        fi
+
+        strict="$(printf '%s' "${INPUT_STRICT}" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
+        case "$strict" in
+          true) args+=( --strict ) ;;
+          false|"") ;;
           *)
-            echo "::error title=ctx-sync::Invalid command '${INPUT_COMMAND}'. Use 'audit' or 'build'."
+            echo "::error title=ctx-sync::Invalid strict value '${INPUT_STRICT}'. Use true or false."
             exit 2
             ;;
         esac
 
-        root="${INPUT_ROOT:-$GITHUB_WORKSPACE}"
-        args=( "$command" --root "$root" )
-
-        if [ -n "${INPUT_SOURCE_DIR}" ]; then
-          args+=( --source "${INPUT_SOURCE_DIR}" )
-        fi
-
-        if [ -n "${INPUT_PROFILES}" ]; then
-          IFS=',' read -ra profiles <<< "${INPUT_PROFILES}"
-          for profile in "${profiles[@]}"; do
-            profile="${profile//[[:space:]]/}"
-            if [ -n "$profile" ]; then
-              args+=( --profile "$profile" )
-            fi
-          done
-        fi
-
-        if [ "$command" = "build" ]; then
-          check="${INPUT_CHECK,,}"
-          if [ "$check" = "true" ]; then
-            args+=( --check )
-          elif [ "$check" != "false" ]; then
-            echo "::error title=ctx-sync::Invalid check value '${INPUT_CHECK}'. Use true or false."
-            exit 2
-          fi
-        else
-          args+=( --fail-on "${INPUT_FAIL_ON,,}" )
-        fi
-
-        annotations="${INPUT_ANNOTATIONS,,}"
-        if [ "$annotations" = "true" ]; then
-          args+=( --github )
-        elif [ "$annotations" != "false" ]; then
-          echo "::error title=ctx-sync::Invalid annotations value '${INPUT_ANNOTATIONS}'. Use true or false."
-          exit 2
-        else
-          args+=( --no-color )
-        fi
-
-        node "$GITHUB_ACTION_PATH/dist/cli.js" "${args[@]}"
+        # Exits 1 (failing the check) on out-of-sync files or exposed secrets,
+        # and on warnings too when strict is true. Findings appear as
+        # annotations on the pull request.
+        node "$GITHUB_ACTION_PATH/dist/index.js" "${args[@]}"

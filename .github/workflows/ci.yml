@@ -37,11 +37,8 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      - name: Verify native files are current
-        run: node dist/cli.js build --check --no-color
-
-      - name: Audit context
-        run: node dist/cli.js audit --fail-on warning --no-color
+      - name: Verify native files are current and the context is safe
+        run: node dist/index.js check --strict
 
   action:
     name: GitHub Action self-test
@@ -50,14 +47,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify generated files
+      - name: Run ctx-sync check
         uses: ./
         with:
-          command: build
-          check: "true"
-
-      - name: Audit tokens and secrets
-        uses: ./
-        with:
-          command: audit
-          fail-on: warning
+          strict: "true"
