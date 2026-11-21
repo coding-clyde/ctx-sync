@@ -1,11 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
+import { getAdapter, isTargetProfile, listProfiles } from "./adapters/index.js";
 import { ConfigError } from "./errors.js";
 import {
-  isTargetProfile,
-  TARGET_PROFILE_DEFAULT_OUTPUTS,
-  TARGET_PROFILES,
   type CtxSyncConfigFile,
   type LoadConfigOptions,
   type ResolvedConfig,
@@ -146,7 +144,7 @@ function parseProfiles(
     for (const profile of requested) {
       if (!isTargetProfile(profile)) {
         throw new ConfigError(
-          `Unknown profile "${profile}". Choose from: ${TARGET_PROFILES.join(", ")}.`,
+          `Unknown profile "${profile}". Choose from: ${listProfiles().join(", ")}.`,
           "config.profiles",
         );
       }
@@ -157,7 +155,7 @@ function parseProfiles(
   const resolved: ResolvedProfileConfig[] = [];
   const outputOwners = new Map<string, string>();
 
-  for (const profile of TARGET_PROFILES) {
+  for (const profile of listProfiles()) {
     const profileRaw = raw?.[profile];
     if (profileRaw !== undefined && !isObject(profileRaw)) {
       throw new ConfigError(
@@ -193,7 +191,7 @@ function parseProfiles(
         ? (profileRaw?.enabled ?? true)
         : requestedSet.has(profile);
     const configuredOutput =
-      profileRaw?.output ?? TARGET_PROFILE_DEFAULT_OUTPUTS[profile];
+      profileRaw?.output ?? getAdapter(profile).defaultOutput;
 
     resolved.push({
       profile,

@@ -11,7 +11,7 @@ import {
   estimateTokens,
   measureText,
 } from "../src/readers/tokenEstimator.js";
-import { TARGET_PROFILES } from "../src/types.js";
+import { listProfiles } from "../src/adapters/index.js";
 import { createFixture, ruleFile } from "./helpers.js";
 
 function sourceFixture() {
@@ -111,7 +111,7 @@ test("sourceReader accepts a relative or absolute source override", async (t) =>
   });
   assert.equal(relative.sourceDirRelative, "context");
   assert.equal(relative.blocks[0]?.id, "alternate");
-  assert.deepEqual(relative.blocks[0]?.targets, [...TARGET_PROFILES]);
+  assert.deepEqual(relative.blocks[0]?.targets, listProfiles());
 
   const absolute = await readSourceDirectory({
     rootDir: fixture.root,

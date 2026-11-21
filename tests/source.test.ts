@@ -5,7 +5,7 @@ import test from "node:test";
 import { SourceError } from "../src/errors.js";
 import { readSourceTree } from "../src/readers/source.js";
 import { parseRuleFile } from "../src/readers/markdown.js";
-import { TARGET_PROFILES } from "../src/types.js";
+import { listProfiles } from "../src/adapters/index.js";
 import { createFixture, ruleFile } from "./helpers.js";
 
 test("reads nested rules deterministically and strips the promoted H1", async (t) => {
@@ -63,7 +63,7 @@ test("reads nested rules deterministically and strips the promoted H1", async (t
   const alpha = source.blocks.find((block) => block.id === "rules-a");
   assert.ok(alpha);
   assert.equal(alpha.title, "Alpha rules");
-  assert.deepEqual(alpha.targets, [...TARGET_PROFILES]);
+  assert.deepEqual(alpha.targets, listProfiles());
   assert.equal(alpha.alwaysApply, true);
   assert.equal(source.diagnostics.some((item) => item.severity === "error"), false);
 });
@@ -78,7 +78,7 @@ test("all is accepted as a targets shorthand", async (t) => {
     rootDir: fixture.root,
     sourceDir: path.join(fixture.root, ".ai"),
   });
-  assert.deepEqual(source.blocks[0]?.targets, [...TARGET_PROFILES]);
+  assert.deepEqual(source.blocks[0]?.targets, listProfiles());
 });
 
 test("a wrapped list item produces a complete Cursor description", () => {

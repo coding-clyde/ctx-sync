@@ -4,7 +4,7 @@ import type {
   RuleFrontmatter,
   TargetProfile,
 } from "../types.js";
-import { TARGET_PROFILES, isTargetProfile } from "../types.js";
+import { isTargetProfile, listProfiles } from "../adapters/index.js";
 import { normalizeLineEndings, stripBom, toPosix } from "../utils/paths.js";
 import { oneLine, truncate } from "../utils/format.js";
 import { parseFrontmatter } from "./frontmatter.js";
@@ -227,7 +227,7 @@ function parseTargets(
   diagnostics: Diagnostic[],
 ): TargetProfile[] {
   if (value === undefined) {
-    return [...TARGET_PROFILES];
+    return listProfiles();
   }
 
   const rawValues: unknown[] = Array.isArray(value) ? value : [value];
@@ -243,7 +243,7 @@ function parseTargets(
       continue;
     }
     if (rawValue.trim().toLowerCase() === "all") {
-      return [...TARGET_PROFILES];
+      return listProfiles();
     }
     values.push(
       ...rawValue
@@ -259,7 +259,7 @@ function parseTargets(
       diagnostics.push({
         severity: "error",
         code: "source.unknown-target",
-        message: `Unknown profile "${valueEntry}" in "targets". Choose from: ${TARGET_PROFILES.join(
+        message: `Unknown profile "${valueEntry}" in "targets". Choose from: ${listProfiles().join(
           ", ",
         )}.`,
         path,

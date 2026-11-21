@@ -17,52 +17,25 @@
 /* Target profiles                                                            */
 /* -------------------------------------------------------------------------- */
 
-export const TARGET_PROFILES = [
-  "claude",
-  "cursor",
-  "copilot",
-  "windsurf",
-] as const;
+/**
+ * Identifier of a native context consumer (an "assistant").
+ *
+ * The set of valid profiles is not hard-coded: it is whatever the adapter
+ * registry in `src/adapters/index.ts` discovers. Adding an assistant means
+ * adding one `src/adapters/<name>Adapter.ts` file; nothing else changes.
+ * Built-in ids: "claude", "cursor", "copilot", "windsurf".
+ */
+export type TargetProfile = string;
+
+/** Shape every profile id must follow (also used as a file/CLI token). */
+export const PROFILE_ID_PATTERN = /^[a-z][a-z0-9-]*$/;
 
 /**
- * Native context consumers ctx-sync knows how to compile for.
- *
- * - claude   -> CLAUDE.md
- * - cursor   -> .cursor/rules/*.mdc
- * - copilot  -> .github/copilot-instructions.md
- * - windsurf -> .windsurfrules
+ * - single-file    -> the adapter emits exactly one file at `output`
+ * - rule-directory -> `output` is a directory ctx-sync owns the generated
+ *                     files of (stale generated files in it are removed)
  */
-export type TargetProfile = (typeof TARGET_PROFILES)[number];
-
-export const TARGET_PROFILE_LABELS = {
-  claude: "Claude Code",
-  cursor: "Cursor",
-  copilot: "GitHub Copilot",
-  windsurf: "Windsurf",
-} as const satisfies Record<TargetProfile, string>;
-
-export const TARGET_PROFILE_DEFAULT_OUTPUTS = {
-  claude: "CLAUDE.md",
-  cursor: ".cursor/rules",
-  copilot: ".github/copilot-instructions.md",
-  windsurf: ".windsurfrules",
-} as const satisfies Record<TargetProfile, string>;
-
 export type AdapterKind = "single-file" | "rule-directory";
-
-export const TARGET_PROFILE_KINDS = {
-  claude: "single-file",
-  cursor: "rule-directory",
-  copilot: "single-file",
-  windsurf: "single-file",
-} as const satisfies Record<TargetProfile, AdapterKind>;
-
-export function isTargetProfile(value: unknown): value is TargetProfile {
-  return (
-    typeof value === "string" &&
-    (TARGET_PROFILES as readonly string[]).includes(value)
-  );
-}
 
 /* -------------------------------------------------------------------------- */
 /* Severity and diagnostics                                                   */
@@ -268,12 +241,29 @@ export interface AdapterRenderContext {
   config: ResolvedConfig;
 }
 
-/** Contract implemented by every target adapter. */
+/**
+ * Contract implemented by every target adapter. A module named
+ * `src/adapters/<name>Adapter.ts` must default-export one of these to be
+ * picked up by the registry.
+ */
 export interface Adapter {
+  /** Lowercase token used in config, `--profile` and rule `targets`. */
   id: TargetProfile;
+  /** Human-readable name used in reports. */
   label: string;
   kind: AdapterKind;
+  /**
+   * Position in reports and generated output (ascending). Optional: adapters
+   * without one come after those with one, ordered by id.
+   */
+  order?: number;
+  /** Repository-relative POSIX file (single-file) or directory. */
   defaultOutput: string;
+  /**
+   * File extensions (with dot) of the files a "rule-directory" adapter
+   * generates. Used to find stale generated files. Ignored for single-file.
+   */
+  extensions?: readonly string[];
   render(blocks: RuleBlock[], context: AdapterRenderContext): GeneratedFile[];
 }
 

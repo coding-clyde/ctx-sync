@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { RuleBlock } from "../src/types.js";
-import { TARGET_PROFILES } from "../src/types.js";
+import { listProfiles } from "../src/adapters/index.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -115,7 +115,7 @@ export function ruleBlock(overrides: Partial<RuleBlock> = {}): RuleBlock {
     sourceAbsolutePath: `/repo/.ai/rules/${id}.md`,
     sourceLine: 8,
     order: 0,
-    targets: [...TARGET_PROFILES],
+    targets: listProfiles(),
     priority: 0,
     globs: [],
     alwaysApply: true,

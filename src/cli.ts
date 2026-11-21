@@ -15,11 +15,8 @@ import type {
   Severity,
   TargetProfile,
 } from "./types.js";
-import {
-  SEVERITY_RANK,
-  TARGET_PROFILES,
-  isTargetProfile,
-} from "./types.js";
+import { SEVERITY_RANK } from "./types.js";
+import { isTargetProfile, listProfiles } from "./adapters/index.js";
 import {
   formatNumber,
   padEnd,
@@ -92,7 +89,7 @@ function mainHelp(): string {
     "  ctx-sync --version           Show the version",
     "",
     "Profiles:",
-    `  ${TARGET_PROFILES.join(", ")}`,
+    `  ${listProfiles().join(", ")}`,
     "",
     "Run `ctx-sync build --help` or `ctx-sync audit --help` for options.",
     "Source format, config, and CI usage: see README.md.",
@@ -183,7 +180,7 @@ function parseProfiles(values: ArgValues): TargetProfile[] | undefined {
     const candidate = entry.trim().toLowerCase();
     if (!isTargetProfile(candidate)) {
       throw new CtxSyncError(
-        `Unknown profile "${entry}". Choose from: ${TARGET_PROFILES.join(", ")}.`,
+        `Unknown profile "${entry}". Choose from: ${listProfiles().join(", ")}.`,
         { code: "cli.profile", exitCode: 2 },
       );
     }

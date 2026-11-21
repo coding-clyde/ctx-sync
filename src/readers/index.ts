@@ -32,10 +32,7 @@ import type {
   SourceCollection,
   TargetProfile,
 } from "../types.js";
-import {
-  TARGET_PROFILES,
-  TARGET_PROFILE_DEFAULT_OUTPUTS,
-} from "../types.js";
+import { getAdapter, listProfiles } from "../adapters/index.js";
 import { listFilesRecursive } from "../utils/fs.js";
 import { relativePosix } from "../utils/paths.js";
 import {
@@ -196,7 +193,9 @@ async function detectOutput(
   try {
     const files = await listFilesRecursive(
       absolutePath,
-      profile === "cursor" ? { extensions: new Set([".mdc"]) } : {},
+      getAdapter(profile).extensions === undefined
+        ? {}
+        : { extensions: new Set(getAdapter(profile).extensions) },
     );
     return {
       detected: {
@@ -245,10 +244,10 @@ export async function readProjectContext(
   const existingOutputs: DetectedContextFile[] = [];
 
   if (options.detectExistingOutputs !== false) {
-    for (const profile of TARGET_PROFILES) {
+    for (const profile of listProfiles()) {
       const configuredPath =
         options.outputs?.[profile] ??
-        TARGET_PROFILE_DEFAULT_OUTPUTS[profile];
+        getAdapter(profile).defaultOutput;
       const result = await detectOutput(rootDir, profile, configuredPath);
       if (result.detected !== undefined) {
         existingOutputs.push(result.detected);

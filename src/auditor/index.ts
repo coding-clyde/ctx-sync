@@ -1,4 +1,4 @@
-import { renderAllProfiles } from "../adapters/index.js";
+import { getAdapter, renderAllProfiles } from "../adapters/index.js";
 import { loadConfig } from "../config.js";
 import { readSourceTree } from "../readers/source.js";
 import {
@@ -19,7 +19,7 @@ import type {
   Severity,
   TokenMetrics,
 } from "../types.js";
-import { TARGET_PROFILE_LABELS, maxSeverity } from "../types.js";
+import { maxSeverity } from "../types.js";
 import { formatNumber } from "../utils/format.js";
 import { combineMetrics, measureText, tokenStatus } from "./tokens.js";
 import { scanSecrets } from "./secrets.js";
@@ -159,7 +159,7 @@ export async function auditProject(
 
     profileReports.push({
       profile,
-      label: TARGET_PROFILE_LABELS[profile],
+      label: getAdapter(profile).label,
       paths: profileFiles.map((file) => file.path),
       files: fileReports,
       blockCount,

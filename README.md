@@ -88,7 +88,8 @@ block strings. Unknown keys are preserved but not emitted.
 `files`, `patterns` and `filePatterns` are accepted as aliases for `globs`;
 `assistants` and `profiles` are accepted as aliases for `targets`.
 
-Valid profiles are `claude`, `cursor`, `copilot`, and `windsurf`. A typo in
+Built-in profiles are `claude`, `cursor`, `copilot`, and `windsurf` (more can
+be added, see [Adding an assistant](#adding-an-assistant)). A typo in
 `targets` is a build error, never a silent fallback to every editor. Duplicate
 ids are also build errors.
 
@@ -265,9 +266,36 @@ wide secret scanning or provider-side key revocation.
 }
 ```
 
-Output paths must stay inside the repository. Cursor output is a directory;
-the other outputs are files. Two profiles cannot write to the same path.
+Output paths must stay inside the repository. Cursor output is a directory
+(`project.mdc` for rules that always apply, plus one `.mdc` per rule scoped by
+`globs`); the other outputs are files. Two profiles cannot write to the same path.
 Unknown config keys are rejected so typos cannot silently disable protection.
+
+## Adding an assistant
+
+Each assistant is one file in `src/adapters/` named `<name>Adapter.ts` that
+default-exports an `Adapter`. The registry in `src/adapters/index.ts` scans the
+directory at startup, so nothing else changes: config validation, `--profile`,
+rule `targets`, `build`, `audit` and the CLI help pick the new profile up
+automatically. For a single-file target:
+
+```ts
+// src/adapters/zedAdapter.ts
+import { createSingleFileAdapter } from "./shared.js";
+
+export default createSingleFileAdapter({
+  id: "zed",
+  label: "Zed",
+  defaultOutput: ".rules",
+  title: "Zed rules",
+  index: false,
+});
+```
+
+For anything more specific (several files, custom frontmatter) implement
+`Adapter.render()` directly, as `cursorAdapter.ts` does. Invalid adapter
+modules (missing default export, bad or duplicate `id`) fail at startup with an
+`adapter.invalid` error.
 
 ## GitHub Action
 
@@ -343,12 +371,12 @@ the network. CI runs Node 20, 22, and 24 plus a self-test of the Action.
 │   └── workflows/ci.yml
 ├── src/
 │   ├── adapters/
-│   │   ├── claude.ts
-│   │   ├── copilot.ts
-│   │   ├── cursor.ts
-│   │   ├── index.ts
+│   │   ├── claudeAdapter.ts
+│   │   ├── copilotAdapter.ts
+│   │   ├── cursorAdapter.ts
+│   │   ├── index.ts               # adapter registry (auto-discovery)
 │   │   ├── shared.ts
-│   │   └── windsurf.ts
+│   │   └── windsurfAdapter.ts
 │   ├── auditor/
 │   │   ├── index.ts
 │   │   ├── secrets.ts

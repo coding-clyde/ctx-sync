@@ -39,7 +39,7 @@ test("writes every enabled profile, then becomes idempotent", async (t) => {
     "CLAUDE.md",
     ".github/copilot-instructions.md",
     ".windsurfrules",
-    ".cursor/rules/overview.mdc",
+    ".cursor/rules/project.mdc",
     ".cursor/rules/typescript.mdc",
   ]) {
     assert.equal(await fixture.exists(relativePath), true, relativePath);

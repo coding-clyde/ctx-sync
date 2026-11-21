@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { renderAllProfiles } from "./adapters/index.js";
+import { getAdapter, renderAllProfiles } from "./adapters/index.js";
 import { hasGeneratedMarker } from "./adapters/shared.js";
 import { loadConfig } from "./config.js";
 import { CtxSyncError } from "./errors.js";
@@ -45,11 +45,11 @@ async function collectChanges(
   diagnostics: Diagnostic[],
 ): Promise<FileChange[]> {
   const changes: FileChange[] = [];
-  const expectedCursorPaths = new Set<string>();
+  const expectedDirectoryPaths = new Set<string>();
 
   for (const file of generated) {
-    if (file.profile === "cursor") {
-      expectedCursorPaths.add(path.resolve(rootDir, file.path));
+    if (getAdapter(file.profile).kind === "rule-directory") {
+      expectedDirectoryPaths.add(path.resolve(rootDir, file.path));
     }
 
     const absolutePath = path.resolve(rootDir, file.path);
@@ -91,29 +91,35 @@ async function collectChanges(
     );
   }
 
-  const cursorProfile = config.profiles.find(
-    (entry) => entry.profile === "cursor" && entry.enabled,
-  );
-  if (cursorProfile !== undefined) {
-    const cursorDirectory = path.resolve(rootDir, cursorProfile.output);
+  // Rule-directory adapters own the generated files in their directory, so
+  // generated files that no longer correspond to a rule are removed.
+  for (const entry of config.profiles) {
+    const adapter = getAdapter(entry.profile);
+    if (!entry.enabled || adapter.kind !== "rule-directory") {
+      continue;
+    }
+    const directory = path.resolve(rootDir, entry.output);
     let existingFiles: string[] = [];
     try {
-      existingFiles = await listFilesRecursive(cursorDirectory, {
-        extensions: new Set([".mdc"]),
-      });
+      existingFiles = await listFilesRecursive(
+        directory,
+        adapter.extensions === undefined
+          ? {}
+          : { extensions: new Set(adapter.extensions) },
+      );
     } catch (error) {
       diagnostics.push({
         severity: "error",
         code: "build.output-directory",
-        message: `Cursor output "${cursorProfile.output}" is not a readable directory: ${
+        message: `${adapter.label} output "${entry.output}" is not a readable directory: ${
           (error as Error).message
         }`,
-        path: cursorProfile.output,
+        path: entry.output,
       });
     }
 
     for (const absolutePath of existingFiles) {
-      if (expectedCursorPaths.has(absolutePath)) {
+      if (expectedDirectoryPaths.has(absolutePath)) {
         continue;
       }
       const relativePath = relativePosix(rootDir, absolutePath);
@@ -130,12 +136,12 @@ async function collectChanges(
         continue;
       }
       if (!hasGeneratedMarker(content)) {
-        // User-authored Cursor rules are never touched.
+        // User-authored rules are never touched.
         continue;
       }
       changes.push({
         path: relativePath,
-        profile: "cursor",
+        profile: entry.profile,
         status: "removed",
         bytes: Buffer.byteLength(content, "utf8"),
         estimatedTokens: measureText(content).estimatedTokens,
@@ -212,7 +218,8 @@ function summarize(
  *  - Nothing is written when the source has errors.
  *  - Existing files without the ctx-sync marker are never overwritten unless
  *    `force` is true.
- *  - Cursor .mdc files without the marker are never deleted.
+ *  - Rule-directory files (e.g. Cursor .mdc) without the marker are never
+ *    deleted.
  */
 export async function syncProject(options: BuildOptions): Promise<BuildSummary> {
   const plan = await planBuild(options);

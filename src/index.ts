@@ -35,11 +35,19 @@ export type {
   ProjectReaderContext,
   ProjectReaderOptions,
 } from "./readers/index.js";
-export { ADAPTERS, renderAllProfiles, renderProfile } from "./adapters/index.js";
-export { claudeAdapter } from "./adapters/claude.js";
-export { copilotAdapter } from "./adapters/copilot.js";
-export { cursorAdapter } from "./adapters/cursor.js";
-export { windsurfAdapter } from "./adapters/windsurf.js";
+export {
+  ADAPTERS,
+  getAdapter,
+  isTargetProfile,
+  listProfiles,
+  renderAllProfiles,
+  renderProfile,
+} from "./adapters/index.js";
+export { createSingleFileAdapter } from "./adapters/shared.js";
+export { claudeAdapter } from "./adapters/claudeAdapter.js";
+export { copilotAdapter } from "./adapters/copilotAdapter.js";
+export { cursorAdapter } from "./adapters/cursorAdapter.js";
+export { windsurfAdapter } from "./adapters/windsurfAdapter.js";
 export { planBuild, syncProject } from "./sync.js";
 export { auditProject, measureBlocks } from "./auditor/index.js";
 export {

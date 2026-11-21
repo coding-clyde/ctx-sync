@@ -30,7 +30,8 @@ source of truth, `.ai/`, into the native context files used by AI assistants:
 ## Repository map
 
 - `src/readers/` parses frontmatter and Markdown into rule blocks.
-- `src/adapters/` renders each target profile.
+- `src/adapters/` renders each target profile. Each assistant is one
+  `<name>Adapter.ts` file auto-registered by `src/adapters/index.ts`.
 - `src/auditor/` estimates tokens and scans for secrets.
 - `src/sync.ts` plans diffs and performs atomic writes.
 - `src/cli.ts` exposes `build` and `audit`.
