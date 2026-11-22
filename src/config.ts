@@ -13,7 +13,7 @@ import {
 import { pathExists, readTextFile } from "./utils/fs.js";
 import { resolveOutputPath, resolveSourceDir, toPosix } from "./utils/paths.js";
 
-export const CONFIG_FILENAME = "ctx-sync.config.json";
+export const CONFIG_FILENAME = "ctx-syncr.config.json";
 
 /**
  * Defaults are intentionally conservative: 12k tokens is already a large
@@ -215,7 +215,7 @@ function parseProfiles(
 
   if (!resolved.some((profile) => profile.enabled)) {
     throw new ConfigError(
-      "No profiles are enabled. Enable at least one in ctx-sync.config.json or pass --profile.",
+      "No profiles are enabled. Enable at least one in ctx-syncr.config.json or pass --profile.",
       "config.no-profiles",
     );
   }
@@ -224,7 +224,7 @@ function parseProfiles(
 }
 
 /**
- * Load and validate ctx-sync.config.json (if present), then apply CLI
+ * Load and validate ctx-syncr.config.json (if present), then apply CLI
  * overrides and safe defaults.
  */
 export async function loadConfig(

@@ -1,6 +1,6 @@
 ---
 name: New adapter request
-about: Ask ctx-sync to support a new AI assistant or editor (Cline, Zed, Aider, JetBrains AI, Gemini CLI, ...)
+about: Ask ctx-syncr to support a new AI assistant or editor (Cline, Zed, Aider, JetBrains AI, Gemini CLI, ...)
 title: "adapter: <assistant name>"
 labels: ["adapter", "enhancement"]
 assignees: ""

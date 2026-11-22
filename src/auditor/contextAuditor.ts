@@ -39,13 +39,13 @@ function compilePatterns(patterns: readonly string[]): RegExp[] {
 function staleMessage(change: FileChange): string {
   switch (change.status) {
     case "created":
-      return `${change.path} is missing; run "ctx-sync sync" to generate it from the source.`;
+      return `${change.path} is missing; run "ctx-syncr sync" to generate it from the source.`;
     case "updated":
-      return `${change.path} is out of date with the source; run "ctx-sync sync".`;
+      return `${change.path} is out of date with the source; run "ctx-syncr sync".`;
     case "removed":
-      return `${change.path} is a stale generated file with no matching rule; run "ctx-sync sync" to remove it.`;
+      return `${change.path} is a stale generated file with no matching rule; run "ctx-syncr sync" to remove it.`;
     default:
-      return `${change.path} cannot be synchronized (it exists but is not managed by ctx-sync); move it aside or run "ctx-sync sync --force".`;
+      return `${change.path} cannot be synchronized (it exists but is not managed by ctx-syncr); move it aside or run "ctx-syncr sync --force".`;
   }
 }
 

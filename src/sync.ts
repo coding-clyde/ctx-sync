@@ -216,7 +216,7 @@ function summarize(
  *
  * Safety contract:
  *  - Nothing is written when the source has errors.
- *  - Existing files without the ctx-sync marker are never overwritten unless
+ *  - Existing files without the ctx-syncr marker are never overwritten unless
  *    `force` is true.
  *  - Rule-directory files (e.g. Cursor .mdc) without the marker are never
  *    deleted.

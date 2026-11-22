@@ -75,7 +75,7 @@ async function assertSourceDirectory(
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       throw new SourceError(
-        `Source directory not found: ${displayPath}. Run "ctx-sync init" to create it.`,
+        `Source directory not found: ${displayPath}. Run "ctx-syncr init" to create it.`,
         "source.missing",
         error,
       );

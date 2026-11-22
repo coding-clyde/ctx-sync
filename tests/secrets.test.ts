@@ -81,12 +81,12 @@ test("ignores documentation placeholders", () => {
 
 test("supports inline ignore markers on the same or previous line", () => {
   const sameLine = scanSecrets(
-    input(`${GITHUB_TOKEN} # ctx-sync:allow-secret`),
+    input(`${GITHUB_TOKEN} # ctx-syncr:allow-secret`),
   );
   assert.equal(sameLine.findings.length, 0);
 
   const previousLine = scanSecrets(
-    input(`<!-- ctx-sync:ignore-secret -->\n${GITHUB_TOKEN}`),
+    input(`<!-- ctx-syncr:ignore-secret -->\n${GITHUB_TOKEN}`),
   );
   assert.equal(previousLine.findings.length, 0);
 });

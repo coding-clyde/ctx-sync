@@ -169,8 +169,8 @@ export const SECRET_PATTERNS: readonly SecretPattern[] = [
 ];
 
 const INLINE_IGNORE_MARKERS = [
-  "ctx-sync:allow-secret",
-  "ctx-sync:ignore-secret",
+  "ctx-syncr:allow-secret",
+  "ctx-syncr:ignore-secret",
 ];
 
 const PLACEHOLDER_PATTERN =

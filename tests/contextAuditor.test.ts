@@ -172,8 +172,8 @@ test("reporter: --json is clean, GitHub annotations, ANSI toggle", async (t) => 
   assert.ok(!json.includes("::error"));
 
   const github = formatReport(result, { env: { GITHUB_ACTIONS: "true" } });
-  assert.match(github, /^::error title=ctx-sync secret,file=\.ai\/overview\.md,line=\d+,col=\d+::/m);
-  assert.match(github, /^::warning title=ctx-sync empty-block,file=\.ai\/empty\.md/m);
+  assert.match(github, /^::error title=ctx-syncr secret,file=\.ai\/overview\.md,line=\d+,col=\d+::/m);
+  assert.match(github, /^::warning title=ctx-syncr empty-block,file=\.ai\/empty\.md/m);
   assert.ok(!github.includes("\u001B"));
 
   const local = formatReport(result, { env: {} });

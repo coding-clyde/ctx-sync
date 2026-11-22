@@ -14,7 +14,7 @@
  *
  * Example:
  *
- *   import { readProjectContext } from "ctx-sync";
+ *   import { readProjectContext } from "ctx-syncr";
  *
  *   const context = await readProjectContext({ rootDir: process.cwd() });
  *   console.log(context.source.blocks);

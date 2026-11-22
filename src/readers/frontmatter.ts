@@ -6,7 +6,7 @@ import { normalizeLineEndings, stripBom } from "../utils/paths.js";
  * Supported: top-level `key: value` mappings, quoted and plain scalars,
  * booleans/null/numbers, inline arrays, dash arrays and literal/folded block
  * strings. Nested mappings are preserved as strings under unknown keys. This
- * is everything ctx-sync needs and keeps runtime dependencies at zero.
+ * is everything ctx-syncr needs and keeps runtime dependencies at zero.
  */
 
 export interface FrontmatterIssue {

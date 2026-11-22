@@ -1,11 +1,20 @@
 {
-  "name": "ctx-sync",
+  "name": "ctx-syncr",
   "version": "0.1.0",
   "description": "Compile AI context rules from .ai/ into native editor files, audit token usage, and catch leaked secrets in CI.",
   "type": "module",
   "license": "MIT",
-  "author": "ctx-sync contributors",
+  "author": "ctx-syncr contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coding-clyde/ctx-sync.git"
+  },
+  "homepage": "https://github.com/coding-clyde/ctx-sync#readme",
+  "bugs": {
+    "url": "https://github.com/coding-clyde/ctx-sync/issues"
+  },
   "keywords": [
+    "ctx-syncr",
     "ai",
     "context",
     "claude",
@@ -18,7 +27,7 @@
     "tokens"
   ],
   "bin": {
-    "ctx-sync": "./dist/index.js"
+    "ctx-syncr": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -163,7 +163,7 @@ test("placeholders and inline allow markers do not trigger findings", async (t) 
         "Set ANTHROPIC_API_KEY=YOUR_API_KEY before running.",
         "Send `Authorization: Bearer <token>` with every request.",
         "Connect with postgres://user:password@localhost:5432/app.",
-        `Documented fixture ${SECRETS["github-token"]} <!-- ctx-sync:allow-secret -->`,
+        `Documented fixture ${SECRETS["github-token"]} <!-- ctx-syncr:allow-secret -->`,
       ].join("\n\n"),
     ),
   });
@@ -177,7 +177,7 @@ test("placeholders and inline allow markers do not trigger findings", async (t) 
 test("secrets.disabledRules in the config turn a rule off", async (t) => {
   const fixture = await createFixture({
     ".ai/overview.md": overviewFile(`Token ${SECRETS["github-token"]}`),
-    "ctx-sync.config.json": { secrets: { disabledRules: ["github-token"] } },
+    "ctx-syncr.config.json": { secrets: { disabledRules: ["github-token"] } },
   });
   t.after(() => fixture.cleanup());
 
@@ -206,7 +206,7 @@ test("check mode reports every missing generated file as critical", async (t) =>
   );
   for (const issue of stale) {
     assert.equal(issue.severity, "critical");
-    assert.match(issue.message, /is missing; run "ctx-sync sync"/);
+    assert.match(issue.message, /is missing; run "ctx-syncr sync"/);
     assert.ok(issue.profile);
   }
 });
@@ -293,7 +293,7 @@ test("check mode flags a stale generated Cursor rule whose source was deleted", 
 test("check mode refuses to treat an unmanaged file as synchronized", async (t) => {
   const fixture = await createFixture({
     ".ai/overview.md": overviewFile(),
-    "CLAUDE.md": "# Written by hand, not by ctx-sync\n",
+    "CLAUDE.md": "# Written by hand, not by ctx-syncr\n",
   });
   t.after(() => fixture.cleanup());
 
@@ -301,7 +301,7 @@ test("check mode refuses to treat an unmanaged file as synchronized", async (t) 
   assert.equal(result.severity, "critical");
   const issue = result.issues.find((entry) => entry.path === "CLAUDE.md");
   assert.ok(issue);
-  assert.match(issue.message, /not managed by ctx-sync/);
+  assert.match(issue.message, /not managed by ctx-syncr/);
 });
 
 /* -------------------------------------------------------------------------- */

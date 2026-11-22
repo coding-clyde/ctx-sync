@@ -40,7 +40,7 @@ jobs:
 
       # Dogfooding: the repository's own AI context must be in sync with .ai/
       # and free of exposed secrets. Exits 1 otherwise (warnings too, --strict).
-      - name: ctx-sync check
+      - name: ctx-syncr check
         run: node dist/index.js check --strict
 
   action:
@@ -50,7 +50,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run ctx-sync check
+      - name: Run ctx-syncr check
         uses: ./
         with:
           strict: "true"

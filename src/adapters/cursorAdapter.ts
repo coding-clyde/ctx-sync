@@ -52,7 +52,7 @@ function renderScopedRule(block: RuleBlock, sourceDirRelative: string): string {
  * frontmatter. Rules that always apply are merged into `project.mdc`
  * (`alwaysApply: true`); rules scoped by globs or manually attached keep a
  * file of their own so Cursor can attach them only when relevant.
- * ctx-sync metadata is never emitted into the frontmatter.
+ * ctx-syncr metadata is never emitted into the frontmatter.
  */
 export const cursorAdapter: Adapter = {
   id: "cursor",

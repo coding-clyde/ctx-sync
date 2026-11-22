@@ -1,4 +1,4 @@
-# Contributing to ctx-sync
+# Contributing to ctx-syncr
 
 Thanks for helping. The fastest contribution is a new assistant adapter: one
 small file in `src/adapters/`. This guide covers the local setup, the
@@ -20,7 +20,7 @@ Run your build against this repository, or against any other one:
 
 ```bash
 node dist/index.js check                   # from this repository
-cd ../some-project && node ../ctx-sync/dist/index.js sync --targets claude
+cd ../some-project && node ../ctx-syncr/dist/index.js sync --targets claude
 ```
 
 | Script | What it does |
@@ -73,7 +73,7 @@ src/
 ├── utils/             filesystem, formatting, path and GitHub helpers
 ├── cli.ts             argument parsing (util.parseArgs) and help text
 ├── index.ts           executable entry point and public API
-├── init.ts            `ctx-sync init` templates
+├── init.ts            `ctx-syncr init` templates
 ├── sync.ts            plans diffs and writes files atomically
 └── types.ts           shared types, including the Adapter contract
 tests/                 *.test.ts, compiled to .test-build/ before running
@@ -115,7 +115,7 @@ export default zedAdapter;
 | --- | --- | --- |
 | `id` | yes | Lowercase token used in `--targets`, rule `targets` and the config. Must match `^[a-z][a-z0-9-]*$` and be unique. |
 | `label` | yes | Human-readable name shown in reports. |
-| `defaultOutput` | yes | Repository-relative POSIX path of the generated file. Users can override it in `ctx-sync.config.json`. |
+| `defaultOutput` | yes | Repository-relative POSIX path of the generated file. Users can override it in `ctx-syncr.config.json`. |
 | `title` | yes | The single H1 of the generated file. |
 | `order` | no | Position in reports (ascending). The built-ins use 10 to 40; adapters without one come last, sorted by `id`. |
 | `index` | no | Emit a linked table of contents. Off by default. Keep it off for files that are always in context, like Copilot's. |
@@ -129,8 +129,8 @@ list the generated `extensions`, and return one `GeneratedFile` per output from
 `render()`. `src/adapters/cursorAdapter.ts` is the reference. Two rules apply to
 every adapter:
 
-- Every generated file must carry the `ctx-sync:generated` marker (use
-  `generatedHeader()` from `shared.ts`). The marker is how ctx-sync knows which
+- Every generated file must carry the `ctx-syncr:generated` marker (use
+  `generatedHeader()` from `shared.ts`). The marker is how ctx-syncr knows which
   files it may overwrite or delete; files without it are treated as yours.
 - Rendering must be deterministic and must use `blocksForProfile()` so
   `targets`, `enabled` and `priority` behave the same for every assistant.
@@ -140,8 +140,8 @@ every adapter:
 ```bash
 npm run build
 cd /path/to/a/scratch/repo
-node /path/to/ctx-sync/dist/index.js init
-node /path/to/ctx-sync/dist/index.js sync --targets zed
+node /path/to/ctx-syncr/dist/index.js init
+node /path/to/ctx-syncr/dist/index.js sync --targets zed
 ```
 
 ```text

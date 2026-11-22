@@ -1,13 +1,13 @@
-name: ctx-sync
+name: ctx-syncr
 description: Fail the check when AI context files are out of sync with .ai/ or expose secrets.
-author: ctx-sync contributors
+author: ctx-syncr contributors
 branding:
   icon: shield
   color: blue
 
 inputs:
   targets:
-    description: "Comma-separated assistants to check (claude, cursor, copilot, windsurf). Empty means all enabled in ctx-sync.config.json."
+    description: "Comma-separated assistants to check (claude, cursor, copilot, windsurf). Empty means all enabled in ctx-syncr.config.json."
     required: false
     default: ""
   max-tokens:
@@ -27,7 +27,7 @@ runs:
       with:
         node-version: "20"
 
-    - name: Build ctx-sync
+    - name: Build ctx-syncr
       shell: bash
       working-directory: ${{ github.action_path }}
       run: |
@@ -37,7 +37,7 @@ runs:
           npm run build --silent
         fi
 
-    - name: Run ctx-sync check
+    - name: Run ctx-syncr check
       shell: bash
       working-directory: ${{ github.workspace }}
       env:
@@ -59,7 +59,7 @@ runs:
         max_tokens="${INPUT_MAX_TOKENS//[[:space:]]/}"
         if [ -n "$max_tokens" ]; then
           if [[ ! "$max_tokens" =~ ^[0-9]+$ ]]; then
-            echo "::error title=ctx-sync::Invalid max-tokens '${INPUT_MAX_TOKENS}'. Use a non-negative integer (0 disables the limit)."
+            echo "::error title=ctx-syncr::Invalid max-tokens '${INPUT_MAX_TOKENS}'. Use a non-negative integer (0 disables the limit)."
             exit 2
           fi
           args+=( --max-tokens "$max_tokens" )
@@ -70,7 +70,7 @@ runs:
           true) args+=( --strict ) ;;
           false|"") ;;
           *)
-            echo "::error title=ctx-sync::Invalid strict value '${INPUT_STRICT}'. Use true or false."
+            echo "::error title=ctx-syncr::Invalid strict value '${INPUT_STRICT}'. Use true or false."
             exit 2
             ;;
         esac

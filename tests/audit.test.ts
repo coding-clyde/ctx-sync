@@ -20,7 +20,7 @@ test("builds a complete, deterministic audit report", async (t) => {
   const report = await auditProject({ rootDir: fixture.root, now });
 
   assert.equal(report.schemaVersion, 1);
-  assert.equal(report.tool.name, "ctx-sync");
+  assert.equal(report.tool.name, "ctx-syncr");
   assert.equal(report.tool.version, VERSION);
   assert.equal(report.generatedAt, now.toISOString());
   assert.equal(report.source.filesRead, 1);
@@ -47,7 +47,7 @@ test("reports block and profile budget overruns with configured budgets", async 
       "id: long\ntitle: Long\nmaxTokens: 3",
       longBody,
     ),
-    "ctx-sync.config.json": {
+    "ctx-syncr.config.json": {
       tokenBudget: { maxPerProfile: 10, maxPerBlock: 1000 },
     },
   });
@@ -143,7 +143,7 @@ test("source errors are critical findings and force a non-zero CLI exit", async 
 test("0 disables a token budget", async (t) => {
   const fixture = await createFixture({
     ".ai/rule.md": ruleFile("id: rule", "# Rule\n\nShort."),
-    "ctx-sync.config.json": {
+    "ctx-syncr.config.json": {
       tokenBudget: { maxPerProfile: 0, maxPerBlock: 0 },
     },
   });

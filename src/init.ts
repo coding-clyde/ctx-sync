@@ -1,7 +1,7 @@
 /**
- * `ctx-sync init`: scaffold a starter `.ai/` folder.
+ * `ctx-syncr init`: scaffold a starter `.ai/` folder.
  *
- * The templates are deliberately generic and pass `ctx-sync check` as-is, so a
+ * The templates are deliberately generic and pass `ctx-syncr check` as-is, so a
  * fresh `init` followed by `sync` works with zero edits. They contain no
  * secrets and no language-specific advice: replace them with your own rules.
  */
@@ -149,7 +149,7 @@ export async function initProject(options: {
     const stats = await fs.stat(sourceDir);
     if (!stats.isDirectory()) {
       throw new CtxSyncError(
-        `${INIT_SOURCE_DIR} exists but is not a directory. Rename or remove it, then run \`ctx-sync init\` again.`,
+        `${INIT_SOURCE_DIR} exists but is not a directory. Rename or remove it, then run \`ctx-syncr init\` again.`,
         { code: "init.exists" },
       );
     }
@@ -157,7 +157,7 @@ export async function initProject(options: {
     if (entries.length > 0) {
       throw new CtxSyncError(
         `${INIT_SOURCE_DIR}/ already exists and is not empty; refusing to overwrite it. ` +
-          "Edit the files there, or move the folder aside and run `ctx-sync init` again.",
+          "Edit the files there, or move the folder aside and run `ctx-syncr init` again.",
         { code: "init.exists" },
       );
     }

@@ -28,7 +28,7 @@ export async function writeTextFileAtomic(
 
   const temporary = path.join(
     directory,
-    `.${path.basename(target)}.ctx-sync-${process.pid}-${randomUUID()}.tmp`,
+    `.${path.basename(target)}.ctx-syncr-${process.pid}-${randomUUID()}.tmp`,
   );
 
   try {

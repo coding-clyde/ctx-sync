@@ -8,7 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and
 
 ### Added
 
-- New command line: `ctx-sync init`, `ctx-sync sync` and `ctx-sync check`,
+- New command line: `ctx-syncr init`, `ctx-syncr sync` and `ctx-syncr check`,
   parsed with `util.parseArgs` in `src/cli.ts`, with `--targets`,
   `--max-tokens`, `--strict`, `--json`, `--help`/`-h` and `--version`/`-v`
   (plus `--force` for `sync`). Exit code 1 on critical findings (also on
@@ -38,9 +38,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and
 
 ### Changed
 
-- **Breaking:** `ctx-sync build` and `ctx-sync audit` are replaced by `sync`
+- **Breaking:** `ctx-syncr build` and `ctx-syncr audit` are replaced by `sync`
   and `check`; `--profile` is now `--targets`. The GitHub Action now runs
-  `ctx-sync check` and accepts only `targets`, `max-tokens` and `strict`
+  `ctx-syncr check` and accepts only `targets`, `max-tokens` and `strict`
   (it also sets up Node 20).
 - `npm test` passes explicit test files to `node --test`; passing a directory
   no longer works on Node 22+.
@@ -70,12 +70,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and
   `.cursor/rules/*.mdc`, `.github/copilot-instructions.md`, and
   `.windsurfrules`.
 - Dependency-free YAML frontmatter parser and rule validation.
-- `ctx-sync build`, `--check`, `--dry-run`, `--force`, profile selection, and
+- `ctx-syncr build`, `--check`, `--dry-run`, `--force`, profile selection, and
   atomic writes with generated-file markers.
 - Safe stale Cursor rule cleanup that never deletes handwritten `.mdc` files.
 - Token estimator with per-rule and per-profile budgets.
 - Secret scanner with redacted findings, fingerprints, allowlists, inline
   suppression markers, and placeholder filtering.
-- `ctx-sync audit` with text, JSON, and GitHub Actions annotation output.
+- `ctx-syncr audit` with text, JSON, and GitHub Actions annotation output.
 - GitHub Action with `build` and `audit` modes.
 - Node 20/22/24 CI, 66 tests with `node --test`, and self-hosted `.ai/` rules.

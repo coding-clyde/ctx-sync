@@ -39,7 +39,7 @@ export function assertInside(
 
 /**
  * Validate a configured output path. Outputs must stay relative so generated
- * files cannot escape the repository when ctx-sync is run in CI.
+ * files cannot escape the repository when ctx-syncr is run in CI.
  */
 export function resolveOutputPath(
   rootDir: string,

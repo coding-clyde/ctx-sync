@@ -105,7 +105,7 @@ test("refuses to overwrite unmanaged files without --force", async (t) => {
   const forced = await syncProject({ rootDir: fixture.root, force: true });
   assert.equal(forced.valid, true);
   assert.equal(forced.ok, true);
-  assert.match(await fixture.read("CLAUDE.md"), /ctx-sync:generated/);
+  assert.match(await fixture.read("CLAUDE.md"), /ctx-syncr:generated/);
 });
 
 test("removes stale generated Cursor rules but preserves handwritten rules", async (t) => {
@@ -113,7 +113,7 @@ test("removes stale generated Cursor rules but preserves handwritten rules", asy
   t.after(() => fixture.cleanup());
   await fixture.write(
     ".cursor/rules/stale.mdc",
-    '<!-- ctx-sync:generated profile="cursor" version="0.1.0" -->\n# Stale\n',
+    '<!-- ctx-syncr:generated profile="cursor" version="0.1.0" -->\n# Stale\n',
   );
   await fixture.write(".cursor/rules/custom.mdc", "# My custom rule\n\nDo not touch.\n");
 

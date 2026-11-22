@@ -24,7 +24,7 @@ export interface Fixture {
 export async function createFixture(
   files: Record<string, string | object> = {},
 ): Promise<Fixture> {
-  const root = await mkdtemp(path.join(tmpdir(), "ctx-sync-test-"));
+  const root = await mkdtemp(path.join(tmpdir(), "ctx-syncr-test-"));
 
   const fixture: Fixture = {
     root,
@@ -78,7 +78,7 @@ export function runCli(
   const cli = path.join(PROJECT_ROOT, "dist", "index.js");
   const environment: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1" };
   // Keep output independent of where the tests run (e.g. inside GitHub Actions).
-  delete environment["CTX_SYNC_DEBUG"];
+  delete environment["CTX_SYNCR_DEBUG"];
   delete environment["GITHUB_ACTIONS"];
   delete environment["FORCE_COLOR"];
   Object.assign(environment, env);

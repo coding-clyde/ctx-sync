@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * ctx-sync entry point and public API.
+ * ctx-syncr entry point and public API.
  *
- * Run as a program (`ctx-sync sync|check|init`) this file orchestrates the
+ * Run as a program (`ctx-syncr sync|check|init`) this file orchestrates the
  * whole pipeline:
  *
  *   init   create a starter `.ai/`
@@ -95,7 +95,7 @@ async function runInit(
       `Created ${result.sourceDir}/ with ${result.created.length} starter files:`,
       ...result.created.map((file) => `  ${file}`),
       "",
-      "Edit them to describe your project, then run `ctx-sync sync`.",
+      "Edit them to describe your project, then run `ctx-syncr sync`.",
     ].join("\n"),
   );
   return 0;
@@ -127,7 +127,7 @@ async function runSync(
       io.stderr(`${diagnostic.severity}:${where} ${diagnostic.message}`);
     }
     if (!summary.valid) {
-      return 2; // e.g. an existing CLAUDE.md that ctx-sync did not generate.
+      return 2; // e.g. an existing CLAUDE.md that ctx-syncr did not generate.
     }
     changes = summary.changes;
   }
@@ -143,7 +143,7 @@ async function runSync(
     if (blocked) {
       parts.push(
         "",
-        "No files were written: fix the critical issues above and run `ctx-sync sync` again.",
+        "No files were written: fix the critical issues above and run `ctx-syncr sync` again.",
       );
     }
     io.stdout(parts.join("\n"));
@@ -246,7 +246,7 @@ function fileSystemMessage(error: unknown): string | undefined {
 
 /**
  * Entry point used by the executable. Never throws and never prints a stack
- * trace unless `CTX_SYNC_DEBUG` is set.
+ * trace unless `CTX_SYNCR_DEBUG` is set.
  */
 export async function main(
   argv: readonly string[] = process.argv.slice(2),
@@ -266,8 +266,8 @@ export async function main(
     }
     const message = error instanceof Error ? error.message : String(error);
     io.stderr(`error: unexpected failure: ${message}`);
-    io.stderr("Set CTX_SYNC_DEBUG=1 for a stack trace.");
-    if (io.env["CTX_SYNC_DEBUG"] !== undefined && error instanceof Error) {
+    io.stderr("Set CTX_SYNCR_DEBUG=1 for a stack trace.");
+    if (io.env["CTX_SYNCR_DEBUG"] !== undefined && error instanceof Error) {
       io.stderr(error.stack ?? message);
     }
     return 3;

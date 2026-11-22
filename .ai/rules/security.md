@@ -18,10 +18,10 @@ tags: [security]
 - The auditor scans both source rules and rendered outputs. Findings are
   redacted: they carry a rule id, path, line, matched length, and a
   non-reversible fingerprint, never the secret itself.
-- Suppress a known-safe fixture with a `ctx-sync:allow-secret` comment on the
+- Suppress a known-safe fixture with a `ctx-syncr:allow-secret` comment on the
   same or previous line, or add a narrowly scoped regular expression to
-  `secrets.allowlist` in `ctx-sync.config.json`.
+  `secrets.allowlist` in `ctx-syncr.config.json`.
 - Never weaken a high-signal pattern to silence a false positive. Prefer an
   allowlist entry with a comment explaining why the value is safe.
-- CI must run `ctx-sync check --strict`. A redacted finding requires
+- CI must run `ctx-syncr check --strict`. A redacted finding requires
   rotating the credential if it was ever real.

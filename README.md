@@ -1,29 +1,29 @@
-# ctx-sync
+# ctx-syncr
 
 **One `.ai/` folder to keep `CLAUDE.md`, `.cursor/rules`, GitHub Copilot and Windsurf in sync — without wasting tokens.**
 
-[![npm version](https://img.shields.io/npm/v/ctx-sync.svg)](https://www.npmjs.com/package/ctx-sync)
+[![npm version](https://img.shields.io/npm/v/ctx-syncr.svg)](https://www.npmjs.com/package/ctx-syncr)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![dependencies: 0](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](package.json)
 [![CI](https://github.com/coding-clyde/ctx-sync/actions/workflows/ci.yml/badge.svg)](https://github.com/coding-clyde/ctx-sync/actions/workflows/ci.yml)
 [![node >=20](https://img.shields.io/badge/node-%3E%3D20-339933.svg)](package.json)
 
-Write your AI rules once in `.ai/`. ctx-sync compiles them into the native file
+Write your AI rules once in `.ai/`. ctx-syncr compiles them into the native file
 each assistant reads, shows what every assistant costs you in tokens, and
 blocks leaked secrets before they reach a commit, a pull request or a prompt.
 
 ```bash
-npx ctx-sync init     # scaffold .ai/ with ready-to-edit rules
-npx ctx-sync sync     # audit, then write CLAUDE.md, .cursor/rules, Copilot and Windsurf files
-npx ctx-sync check    # CI gate: fail on drift or leaked secrets
+npx ctx-syncr init     # scaffold .ai/ with ready-to-edit rules
+npx ctx-syncr sync     # audit, then write CLAUDE.md, .cursor/rules, Copilot and Windsurf files
+npx ctx-syncr check    # CI gate: fail on drift or leaked secrets
 ```
 
-## Why ctx-sync
+## Why ctx-syncr
 
 Every AI editor invented its own context file. Teams copy the same rules into
 four places, the copies drift, nobody knows which one is current, every
 always-on line is paid for in tokens on every request, and sooner or later an
-API key ends up in one of them. ctx-sync treats editor context like code.
+API key ends up in one of them. ctx-syncr treats editor context like code.
 
 - **One source of truth.** Rules live in `.ai/**/*.md`. Output is
   deterministic: same source, same bytes.
@@ -34,16 +34,16 @@ API key ends up in one of them. ctx-sync treats editor context like code.
 - **Secret-proof.** `sync` audits before it writes. If it finds a credential it
   writes nothing, so a leaked key is never copied into four files. Findings are
   redacted: the raw secret is never printed.
-- **CI-native.** `ctx-sync check` fails the build when a generated file drifts
+- **CI-native.** `ctx-syncr check` fails the build when a generated file drifts
   from `.ai/` or a secret is exposed, with annotations on the pull request.
-- **Safe by default.** Files ctx-sync did not generate are never overwritten
+- **Safe by default.** Files ctx-syncr did not generate are never overwritten
   without `--force`. Writes are atomic.
 - **Zero runtime dependencies.** Node.js 20+ built-ins only.
 
 ## Quick start
 
 ```bash
-npx ctx-sync init
+npx ctx-syncr init
 ```
 
 This creates `.ai/` with four starter rules (`00-overview.md`,
@@ -51,37 +51,37 @@ This creates `.ai/` with four starter rules (`00-overview.md`,
 `check --strict`. Edit them, then compile and commit the result:
 
 ```bash
-npx ctx-sync sync
+npx ctx-syncr sync
 git add .ai CLAUDE.md .cursor .github/copilot-instructions.md .windsurfrules
 ```
 
 Commit the generated files so each editor gets its context without running a
 build first. To use the command without `npx`, install it:
-`npm install --save-dev ctx-sync`.
+`npm install --save-dev ctx-syncr`.
 
 ### What it prints
 
-Real output (ctx-sync v0.1.0) from `sync` on a fresh `init`:
+Real output (ctx-syncr v0.1.0) from `sync` on a fresh `init`:
 
 ```text
-$ npx ctx-sync sync
-ctx-sync sync v0.1.0
+$ npx ctx-syncr sync
+ctx-syncr sync v0.1.0
 
-  created   .cursor/rules/project.mdc (434 est. tokens)
+  created   .cursor/rules/project.mdc (435 est. tokens)
   created   .github/copilot-instructions.md (417 est. tokens)
-  created   .windsurfrules (415 est. tokens)
-  created   CLAUDE.md (487 est. tokens)
+  created   .windsurfrules (416 est. tokens)
+  created   CLAUDE.md (488 est. tokens)
 
 Wrote 4 files, removed 0; 0 unchanged.
 
-ctx-sync audit v0.1.0 (audit mode)
+ctx-syncr audit v0.1.0 (audit mode)
 350 estimated tokens in total | budget 4,000 | 8 files scanned
 
 Tokens by assistant
-  Claude Code            487   12%  CLAUDE.md (4 rules)
-  Cursor                 434   11%  .cursor/rules/project.mdc (4 rules)
+  Claude Code            488   12%  CLAUDE.md (4 rules)
+  Cursor                 435   11%  .cursor/rules/project.mdc (4 rules)
   GitHub Copilot         417   10%  .github/copilot-instructions.md (4 rules)
-  Windsurf               415   10%  .windsurfrules (4 rules)
+  Windsurf               416   10%  .windsurfrules (4 rules)
 
 Result OK - 0 critical, 0 warnings
 ```
@@ -89,20 +89,20 @@ Result OK - 0 critical, 0 warnings
 The total counts your rules once; each assistant line is the full generated
 file, headers included, and the percentage is its share of the token budget.
 
-This repository uses ctx-sync on itself. Its `check` output shows the effect of
+This repository uses ctx-syncr on itself. Its `check` output shows the effect of
 scoping: the release checklist targets only `claude` and `copilot`, so Cursor
 and Windsurf load 4 rules instead of 5 and never pay for it.
 
 ```text
-$ npx ctx-sync check
-ctx-sync audit v0.1.0 (check mode)
-1,244 estimated tokens in total | budget 4,000 | 11 files scanned
+$ npx ctx-syncr check
+ctx-syncr audit v0.1.0 (check mode)
+1,246 estimated tokens in total | budget 4,000 | 11 files scanned
 
 Tokens by assistant
-  Claude Code          1,434   36%  CLAUDE.md (5 rules)
-  Cursor               1,393   35%  .cursor/rules/project.mdc +2 (4 rules)
-  GitHub Copilot       1,325   33%  .github/copilot-instructions.md (5 rules)
-  Windsurf             1,202   30%  .windsurfrules (4 rules)
+  Claude Code          1,436   36%  CLAUDE.md (5 rules)
+  Cursor               1,396   35%  .cursor/rules/project.mdc +2 (4 rules)
+  GitHub Copilot       1,328   33%  .github/copilot-instructions.md (5 rules)
+  Windsurf             1,205   30%  .windsurfrules (4 rules)
 
 Result OK - 0 critical, 0 warnings
 ```
@@ -111,8 +111,8 @@ And when someone pastes a credential into a rule, `sync` refuses to write
 anything (the token table is omitted here for brevity):
 
 ```text
-$ npx ctx-sync sync
-ctx-sync audit v0.1.0 (audit mode)
+$ npx ctx-syncr sync
+ctx-syncr audit v0.1.0 (audit mode)
 373 estimated tokens in total | budget 4,000 | 8 files scanned
 
 [...]
@@ -122,7 +122,7 @@ Issues
 
 Result CRITICAL - 1 critical, 0 warnings
 
-No files were written: fix the critical issues above and run `ctx-sync sync` again.
+No files were written: fix the critical issues above and run `ctx-syncr sync` again.
 ```
 
 The command exits with code `1`, and the token itself appears nowhere in the
@@ -178,7 +178,7 @@ permissions:
   contents: read
 
 jobs:
-  ctx-sync:
+  ctx-syncr:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -199,7 +199,7 @@ file and line.
 | `max-tokens` | `4000` | Token budget per assistant and in total; `0` disables it. |
 | `strict` | `false` | Fail on warnings too. |
 
-The action sets up Node 20 and builds ctx-sync on first use (`npm ci` installs
+The action sets up Node 20 and builds ctx-syncr on first use (`npm ci` installs
 only TypeScript dev dependencies; the runtime has none). Prefer no action? The
 same gate is one step:
 
@@ -207,7 +207,7 @@ same gate is one step:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npx --yes ctx-sync check --strict
+      - run: npx --yes ctx-syncr check --strict
 ```
 
 ## CLI reference
@@ -217,19 +217,19 @@ disabled by `NO_COLOR`.
 
 | Command | What it does |
 | --- | --- |
-| `ctx-sync init` | Create a starter `.ai/` folder. Refuses to touch an `.ai/` that already has content. |
-| `ctx-sync sync` | Audit, then write `CLAUDE.md` and the other target files. Writes nothing if the audit finds a critical issue. |
-| `ctx-sync check` | Read-only CI gate: generated files are in sync and the context is safe. |
-| `ctx-sync help [command]` | Show help. Same as `--help`. |
+| `ctx-syncr init` | Create a starter `.ai/` folder. Refuses to touch an `.ai/` that already has content. |
+| `ctx-syncr sync` | Audit, then write `CLAUDE.md` and the other target files. Writes nothing if the audit finds a critical issue. |
+| `ctx-syncr check` | Read-only CI gate: generated files are in sync and the context is safe. |
+| `ctx-syncr help [command]` | Show help. Same as `--help`. |
 
 | Flag | Commands | Default | Meaning |
 | --- | --- | --- | --- |
 | `--targets <list>` | `sync`, `check` | every enabled assistant | Comma-separated assistants (`claude`, `cursor`, `copilot`, `windsurf`). May be repeated. |
 | `--max-tokens <n>` | `sync`, `check` | `4000` | Token budget, per assistant and for the whole source. `0` disables it. |
 | `--strict` | `sync`, `check` | off | Exit `1` on warnings too, not only on critical findings. |
-| `--force` | `sync` | off | Overwrite target files that ctx-sync did not generate. |
+| `--force` | `sync` | off | Overwrite target files that ctx-syncr did not generate. |
 | `--json` | `init`, `sync`, `check` | off | One JSON document on stdout, no ANSI colors. |
-| `-h`, `--help` | all | | Show help (`ctx-sync <command> --help` for one command). |
+| `-h`, `--help` | all | | Show help (`ctx-syncr <command> --help` for one command). |
 | `-v`, `--version` | | | Show the version. |
 
 | Exit code | Meaning |
@@ -237,7 +237,7 @@ disabled by `NO_COLOR`.
 | `0` | Everything is correct (warnings are tolerated unless `--strict`). |
 | `1` | Critical findings, or warnings with `--strict`. |
 | `2` | Usage, configuration or file error (missing `.ai/`, unreadable file, unmanaged target, bad flag). Printed as one `error:` line, never a stack trace. |
-| `3` | Unexpected internal error. Set `CTX_SYNC_DEBUG=1` for a stack trace. |
+| `3` | Unexpected internal error. Set `CTX_SYNCR_DEBUG=1` for a stack trace. |
 
 | Severity | Examples |
 | --- | --- |
@@ -259,7 +259,7 @@ files it wrote. Exit code `2` errors go to stderr and leave stdout empty.
 Generated files carry a stable marker:
 
 ```html
-<!-- ctx-sync:generated profile="claude" version="0.1.0" -->
+<!-- ctx-syncr:generated profile="claude" version="0.1.0" -->
 ```
 
 An existing file without that marker is yours: `sync` stops with exit code `2`
@@ -329,9 +329,9 @@ for the whole source or for any single assistant is a `warning`, which only
 fails the run with `--strict`. Per-assistant totals measure complete generated
 files, including headers; Cursor sums all its generated `.mdc` files.
 
-The finer-grained budgets below (`tokenBudget` in `ctx-sync.config.json`,
+The finer-grained budgets below (`tokenBudget` in `ctx-syncr.config.json`,
 per-rule `maxTokens`) are used by the programmatic `auditProject()` API and are
-not consulted by `ctx-sync sync`/`check`:
+not consulted by `ctx-syncr sync`/`check`:
 
 - `maxPerProfile`: 12,000 tokens per compiled target.
 - `maxPerBlock`: 2,500 tokens per rule.
@@ -360,11 +360,11 @@ findings.
 Suppression options, in order of preference:
 
 ```markdown
-<!-- ctx-sync:allow-secret -->
+<!-- ctx-syncr:allow-secret -->
 The fixture below is fake and covered by the explicit marker.
 ```
 
-Or in `ctx-sync.config.json`:
+Or in `ctx-syncr.config.json`:
 
 ```json
 {
@@ -385,7 +385,7 @@ repository-wide secret scanning or provider-side key revocation.
 
 ### Configuration
 
-`ctx-sync.config.json` is optional. Defaults:
+`ctx-syncr.config.json` is optional. Defaults:
 
 ```json
 {
@@ -418,7 +418,7 @@ protection.
 The CLI is built on small, read-only modules that you can import:
 
 ```ts
-import { readProjectContext } from "ctx-sync";
+import { readProjectContext } from "ctx-syncr";
 
 const context = await readProjectContext({ rootDir: process.cwd() });
 console.log(context.source.blocks, context.tokens.total, context.existingOutputs);
@@ -434,7 +434,7 @@ Bug reports, adapters and docs fixes are welcome. Start with
 [CONTRIBUTING.md](CONTRIBUTING.md); to ask for a new assistant, open an
 [adapter request](https://github.com/coding-clyde/ctx-sync/issues/new?template=new-adapter.md).
 
-If ctx-sync saves you from drifting rule files, a star on GitHub helps other
+If ctx-syncr saves you from drifting rule files, a star on GitHub helps other
 teams find it.
 
 ## License

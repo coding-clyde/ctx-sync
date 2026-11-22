@@ -96,8 +96,8 @@ test("parseCli: rejects invalid input with exit code 2", () => {
     [["sync", "--max-tokens", "lots"], /--max-tokens must be a non-negative integer/],
     [["sync", "--max-tokens", "1.5"], /--max-tokens must be a non-negative integer/],
     [["sync", "--max-tokens"], /max-tokens/],
-    [["check", "--force"], /--force is not valid for `ctx-sync check`/],
-    [["init", "--strict"], /--strict is not valid for `ctx-sync init`/],
+    [["check", "--force"], /--force is not valid for `ctx-syncr check`/],
+    [["init", "--strict"], /--strict is not valid for `ctx-syncr init`/],
     [["init", "--targets", "claude"], /--targets is not valid/],
     [["sync", "extra"], /Unexpected argument "extra"/],
   ];
@@ -131,9 +131,9 @@ test("prints help and version", async (t) => {
 
   const help = await runCli(["--help"], fixture.root);
   assert.equal(help.code, 0);
-  assert.match(help.stdout, /ctx-sync init/);
-  assert.match(help.stdout, /ctx-sync sync/);
-  assert.match(help.stdout, /ctx-sync check/);
+  assert.match(help.stdout, /ctx-syncr init/);
+  assert.match(help.stdout, /ctx-syncr sync/);
+  assert.match(help.stdout, /ctx-syncr check/);
   for (const profile of listProfiles()) {
     assert.ok(help.stdout.includes(profile), `help lists ${profile}`);
   }
@@ -151,7 +151,7 @@ test("prints help and version", async (t) => {
 
   const version = await runCli(["--version"], fixture.root);
   assert.equal(version.code, 0);
-  assert.equal(version.stdout.trim(), `ctx-sync ${VERSION}`);
+  assert.equal(version.stdout.trim(), `ctx-syncr ${VERSION}`);
 });
 
 /* -------------------------------------------------------------------------- */
@@ -318,7 +318,7 @@ test("sync does not overwrite an unmanaged target unless --force", async (t) => 
 
   const forced = await runCli(["sync", "--force"], fixture.root);
   assert.equal(forced.code, 0, forced.stderr);
-  assert.match(await fixture.read("CLAUDE.md"), /ctx-sync:generated/);
+  assert.match(await fixture.read("CLAUDE.md"), /ctx-syncr:generated/);
 });
 
 /* -------------------------------------------------------------------------- */
@@ -343,7 +343,7 @@ test("check passes when in sync and fails (exit 1) on drift", async (t) => {
   const stale = await runCli(["check"], fixture.root);
   assert.equal(stale.code, 1);
   assert.match(stale.stdout, /CLAUDE\.md is out of date/);
-  assert.match(stale.stdout, /ctx-sync sync/);
+  assert.match(stale.stdout, /ctx-syncr sync/);
 
   const afterCheck = await fixture.read("CLAUDE.md");
   assert.match(afterCheck, /edited/, "check must not repair the file");
@@ -413,7 +413,7 @@ test("a missing .ai/ is a clear exit-2 error without a stack trace", async (t) =
     const result = await runCli([command], fixture.root);
     assert.equal(result.code, 2, command);
     assert.match(result.stderr, /^error: Source directory not found: \.ai/);
-    assert.match(result.stderr, /ctx-sync init/);
+    assert.match(result.stderr, /ctx-syncr init/);
     assert.doesNotMatch(result.stderr, /\n\s+at /);
     assert.equal(result.stdout, "");
   }
@@ -438,12 +438,12 @@ test("usage errors exit 2 with a one-line message", async (t) => {
 });
 
 test("an invalid config file is reported without a stack trace", async (t) => {
-  const fixture = await basicFixture({ "ctx-sync.config.json": "{ not json" });
+  const fixture = await basicFixture({ "ctx-syncr.config.json": "{ not json" });
   t.after(() => fixture.cleanup());
 
   const result = await runCli(["check"], fixture.root);
   assert.equal(result.code, 2);
-  assert.match(result.stderr, /ctx-sync\.config\.json is not valid JSON/);
+  assert.match(result.stderr, /ctx-syncr\.config\.json is not valid JSON/);
   assert.doesNotMatch(result.stderr, /\n\s+at /);
 });
 
