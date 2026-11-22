@@ -162,6 +162,31 @@ Cursor gets one `project.mdc` for rules that always apply, plus one `.mdc` per
 rule scoped by `globs`, so Cursor attaches those only when they are relevant.
 See [Source format](#source-format) for every frontmatter key.
 
+### Example Output
+
+```text
+$ ctx-syncr sync
+ctx-syncr sync v0.1.0
+
+  created   .cursor/rules/project.mdc (435 est. tokens)
+  created   .github/copilot-instructions.md (417 est. tokens)
+  created   .windsurfrules (416 est. tokens)
+  created   CLAUDE.md (488 est. tokens)
+
+Wrote 4 files, removed 0; 0 unchanged.
+
+ctx-syncr audit v0.1.0 (audit mode)
+350 estimated tokens in total | budget 4,000 | 8 files scanned
+
+Tokens by assistant
+  Claude Code            488   12%  CLAUDE.md (4 rules)
+  Cursor                 435   11%  .cursor/rules/project.mdc (4 rules)
+  GitHub Copilot         417   10%  .github/copilot-instructions.md (4 rules)
+  Windsurf               416   10%  .windsurfrules (4 rules)
+
+Result OK - 0 critical, 0 warnings
+```
+
 ## GitHub Actions
 
 Copy this into `.github/workflows/ai-context.yml`. It fails the pull request
